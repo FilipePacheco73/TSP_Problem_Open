@@ -2,7 +2,13 @@
 """
 Created on Mon Jun 20 13:52:30 2022
 
-@author: Z52XXR7
+@author: Filipe Pacheco
+
+Algorithm to find the minimum distance into a set of point 
+It's not mandatory to visit each point
+
+Original code extracted from: https://www.pythonpool.com/dijkstras-algorithm-python/
+
 """
 
 def dijkstra(current, nodes, distances):

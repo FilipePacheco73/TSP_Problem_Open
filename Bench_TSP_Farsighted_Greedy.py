@@ -2,56 +2,54 @@
 """
 Created on Tue Jul 26 18:46:09 2022
 
-@author: Z52XXR7
+@author: Filipe Pacheco
 
-Programa para resolução do Problema do Caixeiro Viajante - Travelsales man Problem -
-A fim de estabelecer um Benchmark para verificação de capacidade de processamento - 
+Code to solve Travel Salesman Problem
+Main objective to establish a benchmarking for processing capacity verification 
 
-Algoritmo de busca local de posição fixa e com aleatoriedade para escapar dos mínimos locais
+Utilizing Farsighted Greedy Algorithm with different starting point
 
 """
-#Preamble
-import pandas as pd
+
+# Preamble - Imports
 import numpy as np
-import matplotlib.pyplot as plt
-import random
-from numba import jit, vectorize, prange
+from numba import jit
 import time
 from itertools import permutations, combinations
 
+# Main code
 
-#Main code
+N = 10 # Size of the problem
 
-N = 20 # tamanho do problema
-
+# Creating the distances of the problem
 np.random.seed(73)
 M = np.random.rand(N,N)
 M = np.matmul(M,M.T)
-# np.random.seed(73)
 
-for i in range(N):
+for i in range(N): # Avoid revisit the same city
     M[i,i] = 1000
     
-@jit()
+@jit() # Function with Numba package - convert into C to run faster
 def func_objective(Top_aux,n):
     OBJ_aux = 0
     for k in range(n):
         OBJ_aux += M[Top_aux[k],Top_aux[k+1]]
     return OBJ_aux
 
+# Creating the permutation set list
 def permutations_(set_permutation,cut_front):
     l = list(permutations(set_permutation,cut_front))
     l = np.array(l)
     return l
 
-# @jit()
+# Testable solution with Farsighted Greedy Algorithm
 def objective(N):
     ASW = np.zeros(N+1)
     TP = []
     set_permutation = np.arange(N).tolist()
     
     for ii in range(N):
-        cut_front = min(6,N-ii)
+        cut_front = min(6,N-ii) # Choosable parameter
         for i in TP:
             if i in set_permutation:
                 set_permutation.remove(i)        
@@ -70,7 +68,6 @@ def objective(N):
                         
             OBJ_aux = func_objective(Top_aux,cut_front+ii-1)
             
-
             if OBJ_aux < MG_aux:
                 MG_aux = OBJ_aux
                 # print(OBJ_aux,ii,Top_aux)   
@@ -79,7 +76,6 @@ def objective(N):
         TP.append(TP_aux[ii])
         # print(MG_aux,ii+1)
 
-                
     MG = 0
     for k in range(N-1):
         MG += M[TP[k],TP[k+1]]
@@ -88,6 +84,7 @@ def objective(N):
     ASW[N] = MG
     return ASW
     
+# Results
 start = time.time()
 ASW = objective(N)
 done = time.time()
@@ -96,4 +93,3 @@ print("\nObjective Function:",MG)
 print("Elapsed Time:", done-start)
 ASW = np.delete(ASW,N)
 TP = np.asarray(ASW, dtype=np.int32)
-# print(len(np.unique(TP)))

@@ -2,45 +2,46 @@
 """
 Created on Mon Jun 27 08:38:35 2022
 
-@author: Z52XXR7
+@author: Filipe Pacheco
 
-Programa para resolução do Problema do Caixeiro Viajante - Travelsales man Problem -
-A fim de estabelecer um Benchmark para verificação de capacidade de processamento - 
+Code to solve Travel Salesman Problem
+Main objective to establish a benchmarking for processing capacity verification 
 
-Algoritmo de busca local de posição fixa e com aleatoriedade para escapar dos mínimos locais
+Utilizing random sequence choices
 
 """
-#Preamble
-import pandas as pd
+
+# Preamble - Imports
+
 import numpy as np
-import matplotlib.pyplot as plt
-import random
-from numba import jit, vectorize, prange
+from numba import jit
 import time
 
-#Main code
+# Main code
 
-N = 1000 # tamanho do problema
+N = 1000 # Size of the problem
 
+# Creating the distances of the problem
 np.random.seed(73)
 M = np.random.rand(N,N)
 M = np.matmul(M,M.T)
-# np.random.seed(73)
 
-for i in range(N):
+for i in range(N): # Avoid revisit the same city
     M[i,i] = 100000
     
-# Otimização
+# Optimization Parameters
+
 Top = np.asarray(np.arange(N), dtype=np.int32)
 TP = np.zeros(N, dtype=np.int32)
 ASW = np.zeros(N+1)
 
-@jit()
+@jit() # Function with Numba package - convert into C to run faster
 def objective(Top,TP,ASW,N):
     MG = 100000000000
     for kk in range(1000000):
             
         np.random.shuffle(Top)
+        # Objective function
         OBJ = float(0)
         for k in range(N-1):
             OBJ += float(M[Top[k],Top[k+1]])               
@@ -55,10 +56,10 @@ def objective(Top,TP,ASW,N):
     ASW[N] = MG
     return ASW
 
-
+# Results
 start = time.time()
 ASW = objective(Top,TP,ASW,N)
 done = time.time()
 MG = ASW[N]
 stop = time.time()
-print("elapsed time", done-start)
+print("Elapsed time", done-start)

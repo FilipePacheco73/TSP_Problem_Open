@@ -2,35 +2,33 @@
 """
 Created on Mon Nov 29 07:42:43 2021
 
-@author: Z52XXR7
+@author: Filipe Pacheco
 
-Programa para resolução do Problema do Caixeiro Viajante - Travelsales man Problem -
-A fim de estabelecer um Benchmark para verificação de capacidade de processamento - 
+Code to solve Travel Salesman Problem
+Main objective to establish a benchmarking for processing capacity verification 
 
-Algoritmo de busca local de posição fixa e com aleatoriedade para escapar dos mínimos locais
+Utilizing Greedy Algorithm with different starting point
 
 """
-#Preamble
-import pandas as pd
+
+# Preamble - Imports
+
 import numpy as np
-import matplotlib.pyplot as plt
-import random
-from numba import jit, vectorize, prange
 import time
 
-#Main code
+# Main code
 
-N = 100 # tamanho do problema
+N = 100 # Size of the problem
 
+# Creating the distances of the problem
 np.random.seed(73)
 M = np.random.rand(N,N)
 M = np.matmul(M,M.T)
-# np.random.seed(73)
 
-for i in range(N):
+for i in range(N): # Avoid revisit the same city
     M[i,i] = 1000
-    
-# @jit()
+  
+# Optimization Greedy Algorithm
 def objective(N):
     Top = np.arange(N)
     TP = np.asarray(np.zeros(N), dtype=np.int32)
@@ -45,8 +43,6 @@ def objective(N):
         for i in range(N-1):
             dist_aux = 10000000
             for j in range(N):
-                # if np.random.randint(100) < 99:
-                    # dist_aux = 1000000
                 if M[visited[i],j] < dist_aux:
                     if j not in visited:
                         # print(j)
@@ -60,6 +56,7 @@ def objective(N):
         Top = visited
         # print(visited)
 
+        # Objective function
         OBJ = float(0)
         for k in range(N-1):
             OBJ += float(M[Top[k],Top[k+1]])  
@@ -73,12 +70,13 @@ def objective(N):
     ASW[N] = MG
     return ASW
 
+# Results
+
 start = time.time()
 ASW = objective(N)
 done = time.time()
 MG = ASW[N]
-# print(MG)
-print("elapsed time", done-start)
+print(MG)
+print("Elapsed time", done-start)
 ASW = np.delete(ASW,N)
 TP = np.asarray(ASW, dtype=np.int32)
-print(len(np.unique(TP)))

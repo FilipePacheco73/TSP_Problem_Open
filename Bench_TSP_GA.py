@@ -2,17 +2,17 @@
 """
 Created on Thu Apr 22 07:40:18 2021
 
-@author: Z52XXR7
+@author: Filipe Pacheco
 
-Programa para resolução do Problema do Caixeiro Viajante - Travelsales man Problem -
-A fim de estabelecer um Benchmark para verificação de capacidade de processamento
+Code to solve Travel Salesman Problem
+Main objective to establish a benchmarking for processing capacity verification 
+
+Utilizing Genetic Algorithm - GA
 
 """
-#Preamble
-import pandas as pd
+
+# Preamble - Imports
 import numpy as np
-import matplotlib.pyplot as plt
-import random
 
 #Optimization Libraries 
 from geneticalgorithm2 import geneticalgorithm2 as ga # for creating and running optimization model
@@ -23,23 +23,21 @@ from geneticalgorithm2 import plot_pop_scores # for plotting population scores, 
 from geneticalgorithm2 import Callbacks # simple callbacks
 from geneticalgorithm2 import Actions, ActionConditions, MiddleCallbacks # middle callbacks
 from OppOpPopInit import OppositionOperators
-from numba import jit, vectorize
+from numba import jit
 
-#Main code
+# Main code
 
-N = 20 # tamanho do problema
+N = 10 # Size of the problem
 
+# Creating the distances of the problem
 np.random.seed(73)
 M = np.random.rand(N,N)
 M = np.matmul(M,M.T)
-np.random.seed()
 
-
-for i in range(N):
+for i in range(N): # Avoid revisit the same city
     M[i,i] = 1000
     
-
-@jit()
+@jit() # Function with Numba package - convert into C to run faster
 def objective(c):
 
     cc = np.copy(c)#c.copy()
@@ -59,15 +57,14 @@ def objective(c):
     # Top = np.argsort(c)
     # Top = np.flip(Top)
     
+    # Objective function
     OBJ = 0
-    
     for i in range(N-1):
         OBJ += M[Top[i],Top[i+1]]
-     
 
     return OBJ 
 
-
+# Parameters for the GA algorithm
 varbound = np.array([[0,100]]*N)
 model = ga(objective, dimension = N, 
                  variable_type='real', 
@@ -85,6 +82,7 @@ model = ga(objective, dimension = N,
                                        'max_iteration_without_improv':None}
             )
 
+# Call the solver package
 model.run(
     no_plot = False,
     disable_progress_bar = False,
@@ -110,7 +108,7 @@ model.run(
     seed = None
     )
 
-#Results Representation
+# Results Representation
 X = model.output_dict['variable']
 XX = X.copy()
 
